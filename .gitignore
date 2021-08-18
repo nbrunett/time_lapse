@@ -1,0 +1,14 @@
+# videos #
+*.mp4
+
+# configurations #
+*.yml
+
+# storage directory #
+projects
+
+# backups #
+*~
+
+# OS files #
+.DS_Store
