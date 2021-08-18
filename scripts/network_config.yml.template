@@ -1,0 +1,6 @@
+local_name: cristina
+server_name: meredith
+server_ip: 192.168.0.1
+local_work_dir: /home/rhimes/Videos/time_lapse/
+server_work_dir: /home/rhimes/tmp_timelapse_work_dir/
+sd_dir: /mnt/sd/
