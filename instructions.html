@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Time-lapse instructions</title>
+    <style>
+      a:link {
+          color: #bd93f9;
+          background-color: transparent;
+          text-decoration: none;
+      }
+      a:visited {
+          color: #50fa7b;
+          background-color: transparent;
+          text-decoration: none;
+      }
+      a:hover {
+          color: red;
+          background-color: transparent;
+          text-decoration: underline;
+      }
+      a:active {
+          color: yellow;
+          background-color: transparent;
+          text-decoration: underline;
+      }
+      body {
+          background-color: #282a36;
+      }
+      h1 {
+          color: white;
+      }
+      h2 {
+          color: white;
+      }
+      h3 {
+          color: white;
+      }
+      h4 {
+          color: white;
+      }
+      li {
+          color: #787c87;
+      }
+      p {
+          color: #787c87;
+      }
+      pre {
+          color: #787c87;
+          background-color: #383a59;
+      }
+      code {
+          background-color: #383a59;
+      }
+    </style>
+  </head>
+  <body>
+
+<h1>Time-lapse instructions</h1>
+
+<p>Described here are the workflows for making time-lapse videos with the current tools.</p>
+
+<h1>Table of contents</h1>
+
+<ul>
+  <li><a href="#one_time_setup">One-time setup</a></li>
+    <ol>
+      <li><a href="#create_network_config_yml_file">Create <code>network_config.yml</code> file</a></li>
+    </ol>
+  <li><a href="#each_time_making_time_lapse_videos">Each time making time-lapse videos</a></li>
+    <ol>
+      <li><a href="#activate_the_conda_environment">Activate the <code>conda</code> environment</a></li>
+    </ol>
+  <li><a href="#digital_camcorder">Digital camcorder</a></li>
+    <ol>
+      <li><a href="#acquire_the_video">Acquire the video</a></li>
+      <li><a href="#connect_sd_card_to_local_computer">Connect SD card to local computer</a></li>
+      <li><a href="#run_the_speed_up_script">Run the speed-up script</a></li>
+      <li><a href="#clean_up_sd_card">Clean up SD card</a></li>
+    </ol>
+  <li><a href="#local_computers_webcam">Local computer's webcam</a></li>
+    <ol>
+      <li><a href="#set_video_parameters">Set video parameters</a></li>
+      <li><a href="#position_the_webcam">Position the webcam</a></li>
+      <li><a href="#run_the_video_creation_script">Run the video-creation_script</a></li>
+    </ol>
+  <li><a href="#configuration_files">Configuration files</a></li>
+  <ul>
+    <li><a href="#network_config_yml"><code>network_config.yml</code></a></li>
+    <li><a href="#webcam_parameters_yml"><code>webcam_parameters.yml</code></a></li>
+  </ul>
+</ul>
+
+<h1 id="one_time_setup">One-time setup</h1>
+
+<h2 id="create_network_config_yml_file">Create <code>network_config.yml</code> file</h2>
+
+<p>The parameters that specify computers and directories to use in creating time-lapse videos are read from the <code>scripts/network_config.yml</code> file. Before any of the scripts here can be used, create that file from the <code>scripts/network_config.yml.template</code> file (or just rename it) and edit all values it contains. All keys used by the scripts here, along with descriptions, are presented in <a href="#">this section</a>.</p>
+
+<h1 id="each_time_making_time_lapse_videos">Each time making time-lapse videos</h1>
+
+<h2 id="activate_the_conda_environment">Activate the <code>conda</code> environment</h2>
+
+<p>You will need to have the <code>time-lapse</code> <code>conda</code> environment activated to run the scripts for creating the time-lapse videos, so do so with</p>
+
+<pre>
+  <code>
+    conda activate time-lapse
+  </code>
+</pre>
+
+<p>at the command line interface (CLI).</p>
+
+<h1 id="digital_camcorder">Digital camcorder</h1>
+
+<p>This method uses the digital camcorder to acquire video and then <code>ffmpeg</code> on the server to speed up the video.</p>
+
+<h2 id="acquire_the_video">Acquire the video</h2>
+
+<p>Record a video with the camcorder of whatever you wish to make a time-lapse video of.</p>
+
+<h2 id="connect_sd_card_to_local_computer">Connect SD card to local computer</h2>
+
+<p>Insert the SD card from the camcorder into the local computer after acquiring your video. Video files from the recording will be copied directly from there for processing in the following steps.</p>
+
+<h2 id="run_the_speed_up_script">Run the speed-up script</h2>
+
+<p><a href="#activate_the_conda_environment">Activate</a> the <code>time-lapse</code> <code>conda</code> environment. You will also need to have <code>ssh</code> access to the server for this step since the actual video processing is done there.</p>
+
+<p>Now you can start the speed-up script with</p>
+
+<pre>
+  <code>
+    python time_lapse/scripts/convert_camcorder_videos_to_time_lapse.py
+  </code>
+</pre>
+
+<p>which will open up a <code>finder</code> window in the directory that contains the video files stored on the SD card. Check this directory for the files you want to have sped up and inspect the files to determine how much you want the files sped up (e.g. 10 times faster). The script will ask, for each file in the SD card directory, for the speed up factor or if you want to skip the file for processing. Enter the speed-up factor or "s" to skip the file and then return until the script stops prompting with new files. An example of this would look like</p>
+
+<pre>
+  <code>
+    Enter speed-up factor for 00.MTS or "s" to skip this file. 10
+    Enter speed-up factor for 01.MTS or "s" to skip this file. 10
+    Enter speed-up factor for 02.MTS or "s" to skip this file. s
+  </code>
+</pre>
+
+<p>where <code>00.MTS</code> and <code>01.MTS</code> will be sped up by 10 times each and <code>02.MTS</code> will not have a time-lapse video made from it.</p>
+
+<p>Files will be temporarily transferred to the server where sped-up copies will be made and those files will be transferred back to the local computer. Several status messages will appear in the CLI but you just have to wait until the script finishes at this point. Sped-up files will be placed in the directory specified by the <code>local_work_dir</code> key in <code>scripts/network_config.yml</code>. Files on the SD card are not altered, but all directories and files associated with this process are removed from the server at the end of the script.</p>
+
+<p>Multiple videos can be processed in one running of the script. Separate recordings will be sped up and saved as separate files. Long recordings split across multiple files by the camcorder will be detected automatically and a single concatenated file containing the sped-up video will be made. Both of these cases can also be processed in a single running of the script.</p>
+
+<h2 id="clean_up_sd_card">Clean up SD card</h2>
+
+<p>Once you are satisfied with the results of speeding up the videos, you can unmount the SD card and remove it from the local computer. Deleting the videos from the SD card has only been tested by inserting it back into the camcorder and deleting them through that interface. You will have to do this at this point since the files on the SD card are not altered by the script on the local computer.</p>
+
+<h1 id="local_computers_webcam">Local computer's webcam</h1>
+
+<p>This method uses the local computer's webcam to acquire still images and then <code>ffmpeg</code> on the server to join the stills into a video.</p>
+
+<h2 id="set_video_parameters">Set video parameters</h2>
+
+<p>The parameters that control how the frames are captured and combined into a video are read from the <code>scripts/webcam_parameters.yml</code> file. Create that file from the <code>scripts/webcam_parameters.yml.template</code> file (or just rename it) and edit the following values.</p>
+
+<ol>
+  <li>capture duration in seconds</li>
+  <li>final video duration in seconds</li>
+  <li>frames per second of the final video</li>
+</ol>
+
+<h2 id="position_the_webcam">Position the webcam</h2>
+
+<p>Position the web cam so that it has a view of the subject.</p>
+
+<h2 id="run_the_video_creation_script">Run the video-creation script</h2>
+
+<p><a href="#activate_the_conda_environment">Activate</a> the <code>time-lapse</code> <code>conda</code> environment. You will also need to have <code>ssh</code> access to the server for this step since the actual video processing is done there.</p>
+
+<p>Now you can start the script that will first capture the still frames and then combine them into the time-lapse video, with the following command.</p>
+
+<pre>
+  <code>
+    python scripts/make_webcam_time_lapse.py
+  </code>
+</pre>
+
+<p>A directory will be created in <code>local_work_dir</code>, from <code>network_config.yml</code>, named <code>&lt;start_date_time&gt;_webcam_frames</code>, and the individual frames will be saved in this new directory. Once the capture duration has elapsed, the script will stop capturing new frames, and switch to transferring all of the individual frames to a temporary directory on the server. Frames are combined on the server into a video file and transferred back to the local computer into <code>local_work_dir</code>.</p>
+
+<p>The directory and individual-frame files on the local computer remain after the script finishes. However, all directories and files associated with this process are removed from the server.</p>
+
+<h1 id="configuration_files">Configuration files</h1>
+
+<p>Here are the configuration files used by these scripts with their keys and descriptions of the values that should be set.</p>
+
+<h2 id="nework_config_yml"><code>network_config.yml</code></h2>
+
+<p>The values in this file need to be filled out properly for your setup to run any of the scripts here.</p>
+
+<ul>
+  <li><code>local_name</code></li>
+  <ul>
+    <li>A string specifying the name of the computer where these scripts will be run.</li>
+  </ul>
+  <li><code>server_name</code></li>
+  <ul>
+    <li>A string specifying the name of the server where some of the processing is carried out using <code>ffmpeg</code>.</li>
+  </ul>
+  <li><code>server_ip</code></li>
+  <ul>
+    <li>String specifying the IP address of the server.</li>
+    <li>This will be used for transferring files to and from the server as well as running commands remotely on the server.</li>
+    <li>Can be whatever <code>ssh</code> and <code>rsync</code> will be able to use to resolve the server.</li>
+  </ul>
+  <li><code>local_work_dir</code></li>
+  <ul>
+    <li>String specifying the directory path on the local computer of the time-lapse directory.</li>
+    <li>The final videos will be stored here.</li>
+    <li>The directory containing the webcam individual frame files will be stored here.</li>
+  </ul>
+  <li><code>server_work_dir</code></li>
+  <ul>
+    <li>String specifying the directory path on the server where files will be temporarily transferred and processed.</li>
+    <li>The final directory in the path should not already exist on the server since it will be created and removed by the scripts.</li>
+  </ul>
+  <li><code>sd_dir</code></li>
+  <ul>
+    <li>String specifying the directory path on the local computer where the SD-card data are stored.</li>
+    <li>The contents will be read from this directory but not altered.</li>
+  </ul>
+</ul>
+
+<h2 id="webcam_parameters_yml"><code>webcam_parameters.yml</code></h2>
+
+<p>The values here are only used by the <code>make_webcam_time_lapse.py</code> script. They need to be filled out before running that script.</p>
+
+<ul>
+  <li><code>capture_duration_seconds</code></li>
+  <ul>
+    <li>Number of seconds to spend capturing individual frames with the local computer's webcam.</li>
+    <li>For example, to capture one hour of the sun setting you would set this to <code>3600</code>.</li>
+  </ul>
+  <li><code>video_duration_seconds</code></li>
+  <ul>
+    <li>Number of seconds specifying the duration of the final time-lapse video.</li>
+    <li>For example, to make the video of the sun setting 60 seconds long you would set this to <code>60</code>.</li>
+  </ul>
+  <li><code>video_fps</code></li>
+  <ul>
+    <li>Number specifying the number of frames per second the final time-lapse video will run at.</li>
+    <li>For example, if you want the time lapse of the sun setting to run at 24 frames per second you would set this to <code>24</code>.</li>
+  </ul>
+</ul>
+
+</body>
+</html>
