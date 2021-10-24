@@ -201,16 +201,15 @@ else:
         )
         basenames_to_return.append(f"{concat_list_file_name}_fast.mp4")
 
+    # remove concatenation list files from local computer
+    for f in concat_list_files:
+        os.remove(f)
+
 print(f"Transferring sped-up videos from {network['server_name']} to {network['local_name']}.")
 network_return_files = [f"{network['server_ip']}:{network['server_work_dir']}{f}" for f in basenames_to_return]
 subprocess.run(
     ["rsync", "--info=progress2"] + network_return_files + [network["local_work_dir"]],
 )
-
-# remove concatenation list files from local computer
-if len(concat_list_files) > 0:
-    for f in concat_list_files:
-        os.remove(f)
 
 print(f"Removing intermediate files on {network['server_name']}.")
 subprocess.run(["ssh", network["server_ip"], "rm", "-r", "-f", network["server_work_dir"]])
