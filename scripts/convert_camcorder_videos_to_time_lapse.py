@@ -49,7 +49,7 @@ import subprocess
 import yaml
 
 with open("network_config.yml", "r") as network_f:
-    network = yaml.load(network_f)
+    network = yaml.load(network_f, Loader=yaml.BaseLoader)
 
 subprocess.run(["open", network["sd_dir"]])
 

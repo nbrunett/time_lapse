@@ -46,10 +46,13 @@ import subprocess
 import yaml
 
 with open("network_config.yml", "r") as network_f:
-    network = yaml.load(network_f)
+    network = yaml.load(network_f, Loader=yaml.BaseLoader)
 
 with open("webcam_parameters.yml", "r") as parameters_f:
-    video_parameters = yaml.load(parameters_f)
+    video_parameters_str = yaml.load(parameters_f, Loader=yaml.BaseLoader)
+video_parameters_float = video_parameters_str.copy()
+for key in video_parameters_float:
+    video_parameters_float[key] = float(video_parameters_float[key])
 
 # Capture frames.
 start_date_time = datetime.now()
@@ -57,8 +60,8 @@ start_date_time_str = start_date_time.strftime("%Y-%M-%d_%H-%M-%S")
 frame_dir_basename = f"{start_date_time_str}_webcam_frames"
 os.mkdir(f"{network['local_work_dir']}{frame_dir_basename}")
 
-frame_duration = video_parameters["capture_duration_seconds"] / (video_parameters["video_duration_seconds"] * video_parameters["video_fps"])
-n_frames = int(video_parameters["video_duration_seconds"] * video_parameters["video_fps"])
+frame_duration = video_parameters_float["capture_duration_seconds"] / (video_parameters_float["video_duration_seconds"] * video_parameters_float["video_fps"])
+n_frames = int(video_parameters_float["video_duration_seconds"] * video_parameters_float["video_fps"])
 
 print()
 print("Starting camera.")
